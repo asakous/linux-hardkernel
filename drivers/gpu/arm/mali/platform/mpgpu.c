@@ -20,28 +20,31 @@
 #include <linux/slab.h>
 #include <linux/list.h>
 
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(3, 14, 29))
 #include <mach/io.h>
 #include <plat/io.h>
 #include <asm/io.h>
+#endif
 
 #include <linux/mali/mali_utgard.h>
 #include <common/mali_kernel_common.h>
 #include <common/mali_pmu.h>
 #include "meson_main.h"
 
+#if MESON_CPU_TYPE >= MESON_CPU_TYPE_MESON8
 static ssize_t domain_stat_read(struct class *class, 
 			struct class_attribute *attr, char *buf)
 {
+#if 0
 	unsigned int val;
-#if MESON_CPU_TYPE >= MESON_CPU_TYPE_MESON8
+
 	val = readl((u32 *)(IO_AOBUS_BASE + 0xf0)) & 0xff;
-#else
-	val = 0xffffffff;
-#endif
 	return sprintf(buf, "%x\n", val>>4);
+#else
+	return 0;
+#endif
 }
 
-#if MESON_CPU_TYPE > MESON_CPU_TYPE_MESON6TVD
 #define PREHEAT_CMD "preheat"
 #define PLL2_CMD "mpl2"  /* mpl2 [11] or [0xxxxxxx] */
 #define SCMPP_CMD "scmpp"  /* scmpp [number of pp your want in most of time]. */
@@ -304,11 +307,7 @@ static ssize_t current_pp_write(struct class *class,
 	return count;
 }
 
-#endif
-
-
 static struct class_attribute mali_class_attrs[] = {
-#if MESON_CPU_TYPE >= MESON_CPU_TYPE_MESON8
 	__ATTR(domain_stat,	0644, domain_stat_read, NULL),
 	__ATTR(mpgpucmd,	0644, NULL,		mpgpu_write),
 	__ATTR(scale_mode,	0644, scale_mode_read,  scale_mode_write),
@@ -318,15 +317,16 @@ static struct class_attribute mali_class_attrs[] = {
 	__ATTR(max_pp,		0644, max_pp_read,	max_pp_write),
 	__ATTR(cur_freq,	0644, freq_read,	freq_write),
 	__ATTR(cur_pp,		0644, current_pp_read,	current_pp_write),
-#endif
 };
 
 static struct class mpgpu_class = {
 	.name = "mpgpu",
 };
+#endif
 
 int mpgpu_class_init(void)
 {
+#if MESON_CPU_TYPE >= MESON_CPU_TYPE_MESON8
 	int ret = 0;
 	int i;
 	int attr_num =  ARRAY_SIZE(mali_class_attrs);
@@ -343,10 +343,15 @@ int mpgpu_class_init(void)
 		}
 	}
 	return ret;
+#else
+	return 0;
+#endif
 }
 
 void  mpgpu_class_exit(void)
 {
+#if MESON_CPU_TYPE >= MESON_CPU_TYPE_MESON8
 	class_unregister(&mpgpu_class);
+#endif
 }
 
