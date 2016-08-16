@@ -221,7 +221,7 @@ static int do_umplock_process(_lock_cmd_priv *lock_cmd)
 			}
 		}
 
-		PERROR("failed lock, pid: %d, secure_id: 0x%x, ref_count: %d\n", lock_cmd->pid, lock_item->secure_id, device.items[i_index].references[ref_index].ref_count);
+		PDEBUG(1, "failed lock, pid: %d, secure_id: 0x%x, ref_count: %d\n", lock_cmd->pid, lock_item->secure_id, device.items[i_index].references[ref_index].ref_count);
 
 		mutex_unlock(&device.item_list_lock);
 		return -ERESTARTSYS;
@@ -516,6 +516,7 @@ static struct file_operations umplock_fops = {
 	.open    = umplock_driver_open,
 	.release = umplock_driver_release,
 	.unlocked_ioctl = umplock_driver_ioctl,
+	.compat_ioctl = umplock_driver_ioctl,
 };
 
 int umplock_device_initialize(void)
@@ -567,7 +568,7 @@ void umplock_device_terminate(void)
 
 static int __init umplock_initialize_module(void)
 {
-	PDEBUG(1, "Inserting UMP lock device driver. Compiled: %s, time: %s\n", __DATE__, __TIME__);
+	PDEBUG(1, "Inserting UMP lock device driver.");
 
 	mutex_init(&device.item_list_lock);
 	if (umplock_device_initialize() != 0) {
