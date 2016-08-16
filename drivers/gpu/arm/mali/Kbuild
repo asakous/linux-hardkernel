@@ -144,12 +144,12 @@ mali-y += \
 	
 # amlogic
 mali-y += \
+	platform/meson_main.o \
 	platform/mali_pm_device.o \
-	platform/meson_bu/meson_main2.o \
-	platform/meson_bu/mali_clock.o \
-	platform/meson_bu/mpgpu.o \
-	platform/meson_bu/platform_gx.o \
-	platform/meson_bu/scaling.o	
+	platform/mali_clock.o \
+	platform/mpgpu.o \
+	platform/meson_m450/scaling.o \
+	platform/meson_m450/platform_m8b.o
 
 ifneq ($(wildcard $(src)/linux/mali_slp_global_lock.c),)
 	mali-y += linux/mali_slp_global_lock.o
