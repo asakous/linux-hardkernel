@@ -57,7 +57,6 @@ static struct file_operations mali_fops = {
 	 .unlocked_ioctl = drm_ioctl,
 	 .mmap = drm_mmap,
 	 .poll = drm_poll,
-	 .fasync = drm_fasync,
 };
 
 static struct drm_driver driver = 
@@ -118,9 +117,9 @@ int mali_drm_init(struct platform_device *dev)
 void mali_drm_exit(struct platform_device *dev)
 {
 	if (driver.kdriver.platform_device == dev) {
-		drm_platform_exit(&driver, dev);
+		drm_put_dev(platform_get_drvdata(dev));
 	} else if (driver1.kdriver.platform_device == dev) {
-		drm_platform_exit(&driver1, dev);
+		drm_put_dev(platform_get_drvdata(dev));
 	}
 }
 
